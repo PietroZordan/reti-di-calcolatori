@@ -1,4 +1,4 @@
-# Introduzione 03/10/2022
+# Introduzione 05/10/2022
 ## Comunicazione
 La prima proprietà di cui è giusto a parlare è la comunicazione tra 2 entità (o calcolatori).
 La comunicazione dipende da:
