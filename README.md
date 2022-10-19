@@ -105,6 +105,7 @@ Un indirizzo IP è composto da 32 bit, separati a blocchi di 8 per convenzione (
 
 - - -
 __Esempio__: Verona, parlando di numeri fissi, ha prefisso 045, mentre Padova ha 049. Se a Verona un utente ha il numero "045.803.1459", a Padova sicuramente esiste "049.803.1459"
+- - -
 
 # Indirizzo IP 19/10/2022
 ## Struttura indirizzo
@@ -113,11 +114,15 @@ Solitamente per notazione il numero di bit del prefisso viene indicato dopo l'IP
 In base ai bit dell'indirizzo di rete, possiamo individuare il numero di host che la rete può contenere.
 - - -
 __Esempio__: numero di bit del prefisso "157.27.12.63 /16"
+
 __Esercizi__:
   1) 11100111.11011011.10001011.01101111 -> 231.218.139.111
   2) 221.34.255.82 -> 11011101.00100010.11111111.01010010
+
 __Esempio__: una rete con prefisso /20, avrà 2 elevato a 32-20 host (4096).
+
 __Esempio__: per conoscere il proprio indirizzo ip e la maschera di rete, si può digitare da shell ipconfig.
+
 __nb__: se utilizziamo il comando "whois < indirizzo ip >" ci verrà restituito lo stesso indirizzo, ma con i bit degli host a 0.  Inoltre con ipconfig abbiamo 16 bit di rete, mentre 20 con whois. Questo è dovuto al subnetting, quindi whois ci restituisce l'indirizzo rispetto alla subnet in cui si trova.
 - - -
 
@@ -134,6 +139,7 @@ Il processo di suddivisione della rete (e del suo indirizzo) in più sottoreti �
 
 - - -
 __nb__: precedentemente veniva usato un metodo che fosse classfull, ovvero basato su classi, dove se il primo bit di indirizzo era 0, allora i bit destinati alla rete erano solo i primi 8, se il secondo bit è 0 allora sono 16 di rete. Stessa cosa anche per il 3° bit. Questi indirizzi venivano rispettivamente classficati in A, B, C.
+
 __nb__: l'ultimo indirizzo di una rete (tutti gli host a 1), per convenzione viene assegnato all'indirizzo di broadcast.
 - - -
 
@@ -163,8 +169,9 @@ Al client viene assegnato un indirizzo IP appunto dinamico, ed è indipendente d
 
 - - -
 __nb__: gli indirizzi dinamici in genere verranno forniti da un server DHCP.
-__nb__: un'applicazione web sfrutta il protocollo HTTP.
 
+__nb__: un'applicazione web sfrutta il protocollo HTTP.
+- - -
 L'applicazione utilizza il livello di trasporto per inviare i messaggi. Il livello di trasporto offre 2 tipologie di servizio:
 - connection oriented, affidabile (non accetta perdite di dati).
 - connectionless, non affidabile (può accettare delle perdite).
