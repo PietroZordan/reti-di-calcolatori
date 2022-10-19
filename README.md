@@ -149,7 +149,7 @@ Abbiamo detto che nel modello TCP/IP, abbiamo 2 apparati:
 - - -
 |End    |Tramiti  |
 |-------|---------|
-|apllicativo|     |
+|applicativo|     |
 |trasporto|       |
 |rete   |rete     |
 |datalink|datalink|
