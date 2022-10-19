@@ -147,12 +147,12 @@ Gli indirizzi ip riservati sono indirizzi che non possono essere assegnati a hos
 ## Livello applicativo (TCP/IP)
 Abbiamo detto che nel modello TCP/IP, abbiamo 2 apparati:
 - - -
-|End    |Trasporto|
+|End    |Tramiti  |
 |-------|---------|
 |apllic.|         |
 |traspo.|         |
 |rete   |rete     |
-|datali.|datalink |
+|datalink|datalink |
 |fisico |fisico   |
 - - -
 Quando un processo (istanza di un'applicazione) vuole comunicare con un processo di un altra macchina, deve conoscere l'indirizzo IP e la porta. La tupla, già definita in precedenza (IP sorgente, IP destinazione, porta sorgente, porta destinazione) è detta __socket__. Andiamo ora a identificare 2 tipi di processi:
