@@ -92,11 +92,75 @@ Questo modello teorico è stato sostituito da uno pratico, il modello __TCP/IP__
 __nb__: l'insieme dei protocolli di un architettura di rete è chiamato "stack protocollare".
 - - -
 ### Entità
-L'entità è il processo avviato dalla macchina, e viene identificata mediante l'indirizzo del calcolatore (indirizzo IP) e l'identificatore del processo (porta).
+L'entità è il processo avviato dalla macchina (calcolatore), e viene identificata mediante l'indirizzo del calcolatore (indirizzo IP) e l'identificatore del processo (porta). Quindi i calcolatori comunicano quando i loro processi comunicano.
 
 Quindi un flusso di comunicazione viene identificato univocamente dalla trupla (IPA, IPB, portaA, portaB), dove il numero di porta si trova tra le informazioni dell'header del livello di trasporto, mentre l'indirizzo IP nell'header di rete.
 
-### Indirizzo IP
-Un indirizzo IP è composto da 32 bit, separati a blocchi di 8. Ogni blocco corrisponderà, se tutti i bit sono a 1, a 255 ( 2^8 -1 perchè si parte da 0 ovviamente).
+- - -
+__Esempio__: individua ip e porta
+- - -
 
-# 19/10/2022
+### Indirizzo del calcolatore
+Un indirizzo IP è composto da 32 bit, separati a blocchi di 8 per convenzione (universale). Ogni blocco corrisponderà, se tutti i bit sono a 1, a 255 ( 2^8 -1 perchè si parte da 0 ovviamente). I 32 bit sono separati logicamente in 2 porzioni: prefisso (rete) e suffisso (utente nella rete).
+
+- - -
+__Esempio__: Verona, parlando di numeri fissi, ha prefisso 045, mentre Padova ha 049. Se a Verona un utente ha il numero "045.803.1459", a Padova sicuramente esiste "049.803.1459"
+
+# Indirizzo IP 19/10/2022
+## Struttura indirizzo
+I bit che saranno dedicati all'indirizzo IP dipendono dalla rete.
+Solitamente per notazione il numero di bit del prefisso viene indicato dopo l'IP.
+In base ai bit dell'indirizzo di rete, possiamo individuare il numero di host che la rete può contenere.
+- - -
+__Esempio__: numero di bit del prefisso "157.27.12.63 /16"
+__Esercizi__:
+  1) 11100111.11011011.10001011.01101111 -> 231.218.139.111
+  2) 221.34.255.82 -> 11011101.00100010.11111111.01010010
+__Esempio__: una rete con prefisso /20, avrà 2 elevato a 32-20 host (4096).
+__Esempio__: per conoscere il proprio indirizzo ip e la maschera di rete, si può digitare da shell ipconfig.
+__nb__: se utilizziamo il comando "whois < indirizzo ip >" ci verrà restituito lo stesso indirizzo, ma con i bit degli host a 0.  Inoltre con ipconfig abbiamo 16 bit di rete, mentre 20 con whois. Questo è dovuto al subnetting, quindi whois ci restituisce l'indirizzo rispetto alla subnet in cui si trova.
+- - -
+
+## Indirizzo di rete
+Nei 32 bit di indirizzo, possiamo individuare quelli di rete grazie alla __net mask__, ovvero una stringa di 32 bit dove saranno messi a 1 i bit dedicati alla rete, metre a 0 quelli didicati agli host. Anche la maschera può essere scritta in notazione decimale. Se ho 16 bit di rete, avrò "255.255.0.0". A volte viene rappresentata anche in notazione esadecimale.
+### Subnetting
+Concetto che permette la divisione di una rete in più sottoreti, ciascuna avente il priprio router di bordo. Per suddividere in sottereti un indirizzo:
+1. convertiamo in notazione binaria l'indirizzo (157.27.0.0 /16 -> 10011101.00011011.00000000.00000000).
+2. non potendo modificare la parte di rete, bisogna scomporre i bit degli host. Per dividere in 2 sottoreti, semplicemente aggiungerò all'indirizzo di rete il bit di host più significativo, che sarà 0 per la sottorete A, 1 per la sottorete B (entrambe saranno /17).
+3. convertiamo ora in notazione decimale gli indirizzi (Rete A: 157.27.0.0 /17   Rete B: 157.27.128.0 /17).
+
+Per semplificare il concetto, viene prima verificato l'indirizzo della rete, per raggiungere il router principale, che poi individuerà la destinazione attraverso il/i bit di sottorete.
+Questo metodo utilizzato per la suddivisione dell'indirizzo IP  è il __CIDR__ (classless inter domain routing).
+
+- - -
+__nb__: precedentemente veniva usato un metodo che fosse classfull, ovvero basato su classi, dove se il primo bit di indirizzo era 0, allora i bit destinati alla rete erano solo i primi 8, se il secondo bit è 0 allora sono 16 di rete. Stessa cosa anche per il 3° bit. Questi indirizzi venivano rispettivamente classficati in A, B, C.
+__nb__: l'ultimo indirizzo di una rete (tutti gli host a 1), per convenzione viene assegnato all'indirizzo di broadcast.
+- - -
+
+### Indirizzi riservati
+Gli indirizzi ip riservati sono indirizzi che non possono essere assegnati a host. I principali sono:
+- indirizzo di rete, che avrà i bit degli host tutti a 0.
+- directed broadcast, che avrà i bit degli host tutti a 1.
+- tutti i bit a 0.
+- tutti i bit a 1.
+
+## Livello applicativo (TCP/IP)
+Abbiamo detto che nel modello TCP/IP, abbiamo 2 apparati:
+- - -
+|End    |Trasporto|
+|-------|---------|
+|apllic.|         |
+|traspo.|         |
+|rete   |rete     |
+|datali.|datalink |
+|fisico |fisico   |
+- - -
+Quando un processo (istanza di un'applicazione) vuole comunicare con un processo di un altra macchina, deve conoscere l'indirizzo IP e la porta. La tupla, già definita in precedenza (IP sorgente, IP destinazione, porta sorgente, porta destinazione) è detta __socket__. Andiamo ora a identificare 2 tipi di processi:
+- processo server: processo che gira su un host, sempre raggiungibile (si spera), e che ha un indirizzo IP fisso.
+- processo client: processo responsabile dell'apertura della comunicazione, e che ha un indirizzo IP dinamico.
+
+L'applicazione utilizza il livello di trasporto per inviare i messaggi. Il livello di trasporto offre 2 tipologie di servizio:
+- connection oriented, affidabile.
+- connectionless, non affidabile.
+
+### Applicazione WEB (protocollo HTTP)
