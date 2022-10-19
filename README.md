@@ -97,7 +97,7 @@ L'entità è il processo avviato dalla macchina (calcolatore), e viene identific
 Quindi un flusso di comunicazione viene identificato univocamente dalla trupla (IPA, IPB, portaA, portaB), dove il numero di porta si trova tra le informazioni dell'header del livello di trasporto, mentre l'indirizzo IP nell'header di rete.
 
 - - -
-__Esempio__: individua ip e porta
+__Esempio__: il pachetto viene inviato al calcolatore che nell'header del livello di rete, possiede l'IP interessato. Successivamente il livello di trasporto individua il processo specifico attraverso la porta.
 - - -
 
 ### Indirizzo del calcolatore
@@ -108,7 +108,7 @@ __Esempio__: Verona, parlando di numeri fissi, ha prefisso 045, mentre Padova ha
 
 # Indirizzo IP 19/10/2022
 ## Struttura indirizzo
-I bit che saranno dedicati all'indirizzo IP dipendono dalla rete.
+I bit che saranno dedicati all'indirizzo IP dipendono dalla grandezza della rete.
 Solitamente per notazione il numero di bit del prefisso viene indicato dopo l'IP.
 In base ai bit dell'indirizzo di rete, possiamo individuare il numero di host che la rete può contenere.
 - - -
@@ -130,7 +130,7 @@ Concetto che permette la divisione di una rete in più sottoreti, ciascuna avent
 3. convertiamo ora in notazione decimale gli indirizzi (Rete A: 157.27.0.0 /17   Rete B: 157.27.128.0 /17).
 
 Per semplificare il concetto, viene prima verificato l'indirizzo della rete, per raggiungere il router principale, che poi individuerà la destinazione attraverso il/i bit di sottorete.
-Questo metodo utilizzato per la suddivisione dell'indirizzo IP  è il __CIDR__ (classless inter domain routing).
+Il processo di suddivisione della rete (e del suo indirizzo) in più sottoreti è detto __CIDR__ (classless inter domain routing).
 
 - - -
 __nb__: precedentemente veniva usato un metodo che fosse classfull, ovvero basato su classi, dove se il primo bit di indirizzo era 0, allora i bit destinati alla rete erano solo i primi 8, se il secondo bit è 0 allora sono 16 di rete. Stessa cosa anche per il 3° bit. Questi indirizzi venivano rispettivamente classficati in A, B, C.
@@ -149,18 +149,24 @@ Abbiamo detto che nel modello TCP/IP, abbiamo 2 apparati:
 - - -
 |End    |Tramiti  |
 |-------|---------|
-|applicativo|     |
-|trasporto|       |
+|apllic.|         |
+|traspo.|         |
 |rete   |rete     |
-|datalink|datalink|
+|datalink|datalink |
 |fisico |fisico   |
 - - -
 Quando un processo (istanza di un'applicazione) vuole comunicare con un processo di un altra macchina, deve conoscere l'indirizzo IP e la porta. La tupla, già definita in precedenza (IP sorgente, IP destinazione, porta sorgente, porta destinazione) è detta __socket__. Andiamo ora a identificare 2 tipi di processi:
 - processo server: processo che gira su un host, sempre raggiungibile (si spera), e che ha un indirizzo IP fisso.
 - processo client: processo responsabile dell'apertura della comunicazione, e che ha un indirizzo IP dinamico.
+Il server è quindi il processo sempre in ascolto, mentre il client è il processo che manda la richiesta di comunicazione (appunto è lui a realizzare la comunicazione). Proprio per questo il server ha un indirizzo fisso, perchè il client deve poterlo conoscere.
+Al client viene assegnato un indirizzo IP appunto dinamico, ed è indipendente dall'effettivo indirizzo del dispositivo.
+
+- - -
+__nb__: gli indirizzi dinamici in genere verranno forniti da un server DHCP.
+__nb__: un'applicazione web sfrutta il protocollo HTTP.
 
 L'applicazione utilizza il livello di trasporto per inviare i messaggi. Il livello di trasporto offre 2 tipologie di servizio:
-- connection oriented, affidabile.
-- connectionless, non affidabile.
+- connection oriented, affidabile (non accetta perdite di dati).
+- connectionless, non affidabile (può accettare delle perdite).
 
-### Applicazione WEB (protocollo HTTP)
+# /10/2022
