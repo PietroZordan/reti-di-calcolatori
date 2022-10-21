@@ -176,4 +176,51 @@ L'applicazione utilizza il livello di trasporto per inviare i messaggi. Il livel
 - connection oriented, affidabile (non accetta perdite di dati).
 - connectionless, non affidabile (può accettare delle perdite).
 
-# /10/2022
+# Applicazione Web 21/10/2022
+## Protocollo HTTP
+Il server mantiene una pagina Web, e il client, interessato a ricevere la pagina, invia la richiesta verso il server per quello determinata pagina.
+La __pagina web__ è una collezione di documenti o file:
+- file che contiene la struttura della pagina (.html).
+- altri elementi (immagini e video).
+- script e stylesheet.
+
+A grandi linee, la comunicazione tra client e server è la seguente:
+1. Il server resta in attesa.
+2. Il client manda la richiesta della pagina, al server, eseguendo la ricerca sul browser.
+3. Il server invia la risposta, negativa o positiva.
+4. Il client manda a livello applicativo, un messaggio detto __get__.
+5. Il server "scinde" il file (solo .html) in pacchetti, che invia al client.
+6. Il client ricompone i pacchetti, e ottiene il file.
+Per ricevere gli altri file della pagina web, ci sono 2 soluzioni:
+- connessione persistente: vengono mandati ulteriori GET in parallelo, per ogni file, nella stessa connessione.
+- connessione non persistente: la connessione viene chiusa, e viene ripetuta la procedura per ogni file, ma le connessioni vengono aperte in parallelo.
+
+- - -
+__nb__: HTTP (hyper text transfer protocol).
+
+__nb__: i punti 2,3,4 fanno parte dell'apertura della connessione TCP.
+
+__nb__: il protocollo HTTP è un protocollo testuale.
+- - -
+
+### Messaggi di richiesta e risposta
+Ogni messaggio di richiesta è composto dalla __riga di richiesta__ e da una o più __righe di intestazione__.
+La riga di richiesta, serve appunto per richiedere la risorsa al server, ed userà i vari metodi messi a disposizione della classe HTTP: GET per richiedere una risorsa, POST per inviare le informazioni, DELETE...
+La righe di intestazione sono invece delle etichette contenenti delle informazioni utili per la risorsa richiesta.
+
+Il server, quando riceve una richiesta HTTP, è sempre obbligato a mandare una risposta. In questo caso, il messaggio sarà composto da __riga di stato__, righe di intestazione e la risosrse richiesta. Come già detto, in qualsiasi caso il server deve rispondere, e lo può fare con i seguenti codici (nella riga di stato) a seconda della situazione: 200, 400, 404, 405.
+
+- - -
+__Esempio__: www.univr.it/index.html -> "richiesta"= GET /index.html http/1.1  "intestazione"= Host:www.univr.it User-agent: mozzilla/4.0
+
+__Esempio__: "stato"= HTTP/1.1 200 descrizione "intestazione"= ...
+
+__Esercizio__: IP: 140.120.84.20 /20  -> Ind.rete: 140.120.80.0 /20
+
+__Esercizio__: 165.5.1.0 /24 -> 165.5.1.192  _128  _64 /26
+
+__Esercizio__: 165.5.1.0 /25  165.5.1.128 _64 /26
+- - -
+
+
+
