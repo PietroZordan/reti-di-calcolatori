@@ -222,5 +222,70 @@ __Esercizio__: 165.5.1.0 /24 -> 165.5.1.192  _128  _64 /26
 __Esercizio__: 165.5.1.0 /25  165.5.1.128 _64 /26
 - - -
 
+# Potocolli HTTP e di posta elettronica 26/20/2022
+## Cookie
+Permettono di capire (al server) se c'è già stata un interazione in precedenza tra un server e un client specifico.
+In una prima interazione, quando il client invia la richiesta, il server associa all'utente un numero identificativo, che lo invia nella risposta in una riga di intestazione "set-cookie: ". Il client può decidere se memorizzare l'ID o meno.
+In una richiesta successiva, il client invierà il codice in una riga di intestazione "cookie: ", e in base ad esso, il server agirà di conseguenza, con una risposta adatta all'utente in particolare.
 
+## Caching
+Durante una comunicazione, è presente un server __cache__ che riceve le richieste del client e le risposte del server. Se un qualunque client, invia un richiesta che è già stata posta alla cache, essa invierà la risposta del server, che aveva memorizzato in precedenza. Questo permette di ridurre notevolmente il traffico. Ci sono vari livelli di chaching: rete locale, browser, ISP. La percentuale con cui la chace soddisfa le richieste, è detta __hit ratio__.
 
+### Get condizionale
+C'è la possibilità che il server aggiorni una propria pagina, e quindi la copia della pagina contenuta della cache non sarebbe aggiornata. Per sviare a questo problema nella richiesta GET viene aggiunta la riga di intestazione "if-modified-since: ", che permette alla cache di capire, se può usare la copia di risposta che essa contiene.
+Quindi in realtà, la comunicazione con il server è sempre presente, ma i messaggi non contengono i dati della risposta.
+
+## DNS
+Il server DNS è locale alla rete, e permette di tradurre i nomi logici nei corrispondenti indirizzi IP. Il DNS opera prima che la connessione tra client e server comincino la connessione, intercettando la richiesta del client, e traducendo all'indirizzo del server il nome logico del sito. Per "memorizzare" queste associazioni, viene usato un __sistema distribuito generico di server DNS__:
+- Server DNS Root.
+- Server DNS TLD (top level domain): contiene le informazioni relative ai domini principali.
+- Server DNS locale.
+In questa gerarchia, un server locale può andare ad individuare a quale IP corrisponde un certo nome logico, richiedendolo ai server TLD e Root.
+Vedia ora una cominicazione generica, in cui un cliente invia la richiesta del sito "www.site.org":
+1. Il client invia la richiesta www.site.org al DNS locale della rete.
+2. Il DNS locale, non trovando nessuna corrispondenza, manda la richiesta ad un server Root.
+3. Il Root invia in risposta il dns per il server TLD di dominio ".org".
+4. Il DNS locale allora richiede al server TLD .org.
+5. Il server TLD invia al server locale, il DNS locale di "site.org".
+6. Il server locale richiede l'IP per "www.site.org" al locale di "site.org".
+7. Il server locale di "site.org" invia l'IP a server, che poi lo passa al client.
+Le associazioni più vecchie verranno eliminate, in quanto la memoria è limitata.
+
+- - -
+__Esempio__: grazie al cookie il server potrebbe rispondere in future interazioni, mostrando all'utente elementi già cercati in precedenza.
+
+__nb__: DNS (domain name system).
+
+__Esempio__: il DNS traduce "www.univr.it" nel indirizzo ip del server.
+
+__Esempio__: www.site.org "site" è il dominio di un server locale, mentre "org" è il dominio di gerarchia superiore, contenuto nel proprio server TLD.
+- - -
+
+## Protocolli di posta elettronica
+Per la prosta elettronica, ci sono 2 protocolli principali, __SMTP__ e __IMAP__, rispettivamente per l'invio e la ricezione dei messaggi.
+Entrambi sono protocolli di tipo client/server, e si appoggiano a quello TCP, che è affidabile e connection oriented.
+Ogni dominio avrà un server di posta elettronica, ed esso contiene una __coda__ (buffer) per i messaggi in uscita, e delle __caselle__ ognuna per ogni utente del dominio. L'architettura di un dominio di posta elettronica può essere rappresentata con:
+- utente client del dominio (nome.cognome@dominioPostaElettronica.dominio).
+- server posta elettronica del dominio (@dominioPostaElettronica.dominio).
+La comunicazione tra 2 utenti di dominio differente, può essere rappresentata con:
+1. Utente del dominio @dom1.it, manda una mail ad un altro utente del dominio @dom2.it.
+2. Essendo il dominio diverso da quello del server, la mail viene messa nella coda di uscita del server.
+3. La mail viene spedita al server @dom2.it e inserita nella casella dell'utente.
+4. Per visualizzare la mail, attraverso il protocollo IMAP (e a quello HTTP) l'utente accede alla propria posta elettronica.
+
+- - -
+__nb__: SMTP (simple mail transfer protocol) e IMAP ().
+
+__nb__: quando il server invia il messaggio al server di un'altro dominio, svolge il ruolo di client.
+
+__nb__: SMTP è un protocollo testuale.
+
+__nb__: per la ricezione è usato anche il protocollo HTTP (POP è deprecato).
+
+__Esercizio__: 101.75.79.255 101.75.80.0  Lan1:/21 Lan2:1000host Lan3:/23 Lan4:400host Lan5:bloccoIndirizzi/2
+- - -
+
+## Livello di trasporto
+Si occupa di dividere il messaggio in pacchetti, aventi ognuno un header contenente informazioni utili, come ad esempio l'ordine con cui i pacchetti vanno assemblati una volta arrivati a destinazione. Possono essere utilizzati 2 protocolli, ovvero TCP e __UDP__.
+
+dns e posta elettronica da controllare nella rec.
