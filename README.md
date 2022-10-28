@@ -289,3 +289,58 @@ __Esercizio__: 101.75.79.255 101.75.80.0  Lan1:/21 Lan2:1000host Lan3:/23 Lan4:4
 Si occupa di dividere il messaggio in pacchetti, aventi ognuno un header contenente informazioni utili, come ad esempio l'ordine con cui i pacchetti vanno assemblati una volta arrivati a destinazione. Possono essere utilizzati 2 protocolli, ovvero TCP e __UDP__.
 
 dns e posta elettronica da controllare nella rec.
+
+# TCP nel livello di trasporto 28/10/2022
+## Formato dei messaggi
+
+L'header nel TCP è composto da 20 byte (32 bit), ed è composto dai seguenti campi suddivisi in righe:
+1. campo porta sorgente e campo destinazione (2 byte ciscuno).
+2. campo sequence number ().
+3. campo acknowledge number ().
+4. campo offset (), reserved (), flag (6 bit), window (2 byte).
+5. campo checksum (), urgent pointer ().
+
+### Campi porta
+Sono campi identificativi dei processi sorgenti e destinazione, coinvolti nello scambio di informazioni.
+Le porte possono essere __statiche__ o __dinamiche__. Le prime sono associati ad applicazioni __lato server__ definite da standard, le seconde sono assegnati dal OS ai processi __lato client__.
+
+### Campo sequence number
+Le applicazioni generano messaggi di lunghezza arbitraria (molto variabile). Ai livello più bassi ( fisico e datalink), viene definita dalla scheda di rete una dimensione massima __MTU__ che deve avere il pacchetto. Questa dimesione è conosciuta dal TCP, e gli permette di definire una __MSS__ e quindi la segmentazione del messaggio in pacchetti. Il sequence number è quindi un identificativo per ricostruire l'ordine dei pacchetti.
+
+### Campo acknowledge number
+Tenendo conto che il TCP è un protocollo affidabile, viene usata la tecnica __positive acknowledge with retrasmission__. Viediamo un'ipotetica comunicazione tra hostA e hostB:
+1. A manda il primo pacchetto.
+2. B manda in risposta un acknowledge o __ack__, per riferire che è arrivato il pacchetto.
+3. A manda i seguenti pacchetti nello stesso modo.
+
+### Campo checksum
+Controlla che non ci siano errori nel pacchetto arrivato. Per farlo, prende il pacchetto (escluso il checksum, essendo lui) e attraverso una particolare funzione che prende un input, che indipendentemente dalla dimensione restituisce un output di dimensione fissa:
+1. A manda il pacchetto a B.
+2. B esegue appunto la funzione da cui ottiene l'output.
+3. B confronta il checksum con l'output.
+Se checksum e output sono diversi c'è sicuramente un errore, in caso contrario n on è detto che sia primo di errori.
+- - -
+__Esempio__: la porta statica per HTTP è la porta 80. Per SMTP è 25.
+
+__nb__: ricorda che una comunicazione è definita da (ipC, portaC, ipS, portaS).
+
+__nb__: la porta del client è dinamica, mentre quella del server è statica, visto che deve stare sempre in ascolto.
+
+__nb__: le porte dinamiche sono >= 1024.
+
+__nb__: MTU (maximum trasmission unit).
+
+__nb__: MSS (maximum segment size).
+
+__nb__: l'ack è un header TCP che non trasporta dati.
+- - -
+
+## Gestione delle connessioni
+Essendo il TCP connection oriented, aperta la connessione, prima di scambiare i dati vengono scambiati dei parametri. I due processi coinvolti si scambiano una serie di header TCP, vediamo generalmente quali:
+1. Messaggio di SYN: vengono specificati le porte sorgente e destinazione, sequence number e flags, uno in particolare, il __flag syn__.
+2. Messaggio di SYN-ACK: vengono specificati sequence number e flags, in particolare __flag ack__ e flag syn.
+3. Messaggio di ACK: viene specificato a 1 solo il flag di ack.
+Nel campo sequence number del massaggio di SYN, contiene un valore scelto casualmente e usato come riferimento per la ricezione successiva.
+- - -
+__nb__: in fase di apertura della connessione, nelle opzioni viene inserito il valore della MSS. Il messaggio si adatterà alla MSS minore.
+- - -
