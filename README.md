@@ -293,12 +293,12 @@ dns e posta elettronica da controllare nella rec.
 # TCP nel livello di trasporto 28/10/2022
 ## Formato dei messaggi
 
-L'header nel TCP è composto da 20 byte (32 bit), ed è composto dai seguenti campi suddivisi in righe:
-1. campo porta sorgente e campo destinazione (2 byte ciscuno).
-2. campo sequence number ().
-3. campo acknowledge number ().
-4. campo offset (), reserved (), flag (6 bit), window (2 byte).
-5. campo checksum (), urgent pointer ().
+L'header nel TCP è composto da 20 byte, ed è composto dai seguenti campi suddivisi in righe da 32 bit ciascuna:
+1. campo porta sorgente e campo destinazione (2+2 byte).
+2. campo sequence number.
+3. campo acknowledge number.
+4. campo offset (4 bit), reserved (6 bit), flag (6 bit), window (2 byte).
+5. campo checksum, urgent pointer.
 
 ### Campi porta
 Sono campi identificativi dei processi sorgenti e destinazione, coinvolti nello scambio di informazioni.
@@ -337,10 +337,12 @@ __nb__: l'ack è un header TCP che non trasporta dati.
 
 ## Gestione delle connessioni
 Essendo il TCP connection oriented, aperta la connessione, prima di scambiare i dati vengono scambiati dei parametri. I due processi coinvolti si scambiano una serie di header TCP, vediamo generalmente quali:
-1. Messaggio di SYN: vengono specificati le porte sorgente e destinazione, sequence number e flags, uno in particolare, il __flag syn__.
-2. Messaggio di SYN-ACK: vengono specificati sequence number e flags, in particolare __flag ack__ e flag syn.
-3. Messaggio di ACK: viene specificato a 1 solo il flag di ack.
-Nel campo sequence number del massaggio di SYN, contiene un valore scelto casualmente e usato come riferimento per la ricezione successiva.
+1. Messaggio di SYN (client): porte sorgente e destinazione, sequence number e __flag syn__ a 1.
+2. Messaggio di SYN-ACK (server): porte sorgente e destinazione (invertite), sequence number, acknoledge number,__flag ack__ e flag syn a 1.
+3. Messaggio di ACK (client): porte sorgente e destinazione, flag di ack a 1.
+Il campo sequence number del massaggio di SYN, contiene un valore scelto casualmente e usato come riferimento per la ricezione successiva.
 - - -
 __nb__: in fase di apertura della connessione, nelle opzioni viene inserito il valore della MSS. Il messaggio si adatterà alla MSS minore.
+
+__nb__: nel messaggio di SYN viene usato un sequence number casuale, per questioni di sicurezza.
 - - -
