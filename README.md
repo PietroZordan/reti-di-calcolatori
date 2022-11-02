@@ -346,3 +346,54 @@ __nb__: in fase di apertura della connessione, nelle opzioni viene inserito il v
 
 __nb__: nel messaggio di SYN viene usato un sequence number casuale, per questioni di sicurezza.
 - - -
+
+# Protocollo TCP 2/11/2022
+## Comportamento del protocollo
+### Suddivisione in pacchetti
+Grazie al sequence number, nella suddivisione del messaggio in pacchetti, è l'offset rispetto l'inizio, in termini di byte. Quindi per il primo pacchetto, sarà 0 + ISN. L'ISN verrà dato all'inizio della condizione, e sarà un numero casuale.
+Con un MSS di 1200 byte, il pacchetto sarà:
+- da 0 a 1199 byte.
+- il sequence number sarà 0 + ISN.
+Il pacchetto successivo invece:
+- da 1200 a 2399 byte.
+- il sequence number sarà 1200 + ISN.
+
+Mentre l'acknowledge number è il prossimo byte (che sarà il primo byte del pacchetto atteso) che il destinatario si aspetta di ricevere.
+
+Se il flag __push__ è a 1, bisogna forzare il pacchetto per arrivare a destinazione.
+
+Il protocollo TCP è un protocollo di  tipo __stream__.
+
+### Chiusura della connessione
+Dopo aver aperto la connessione, avviene lo scambio di dati, e successivamente inizia la fase di chiusura della connessione. Anch'essa avviene con uno scambio di header TCP, e può avvenire da entrambi gli host in maniera indipendente:
+- il client invia un messaggio di FIN, dove sarà a 1 il flag __FIN__.
+- il server risponderà con un messaggio di ACK, e trasmette i dati che deve trasmettere.
+- il server invierà il suo messaggio di FIN, a cui il client risponderà con l'ACK.
+Se invece il server non ha niente da inviare, invierà direttamente un messaggio di FIN-ACK.
+
+### Affidabilità del protocollo
+I pacchetti trasmessi arriveranno sempre alla destinazione. Al ricevimento di un pacchetto, l'host risponde con un acknoledge number, ma i pacchetti potrebbero andare persi turante il tragitto.
+Se l'host sorgente non riceve conferma che il pacchetto è arrivato, attende il tempo RTO, e reinvia i dati. Avviene lo stesso anche nel caso venga perduto il messaggio di conferma.
+- - -
+__nb__: ISN (initial sequence number).
+
+__nb__: l'apertura di connessione con messaggi di SYN e ACK, è detta "three way handshake".
+
+__nb__: lo scenario di chiusura della connessione può avvenire anche al contrario.
+
+__nb__: RTO (retrasmission time out). Viene calcolato in base all'attesa di risposta dei messaggi precedenti (media del RTT). RTO = betha SRTT attuale.
+
+__nb__: RTT (round trip time). Si tratta del tempo che intercorre tra messaggio e risposta.
+
+__nb__: SRTT attuale= alpha SRTT precedente + (1-alpha) RTT instantaneo. Alpha è 7/8 per lo standard. Betha è 2 per lo standard.
+- - -
+
+## Trasmissione dei pacchetti
+- controllo di flusso: azione preventiva che limita la quantità di dati immessi nella rete. Viene definità una dimensione detta "di finestra", e tale dimensione detta la dimensione della serie di pacchetti da inviare prima  di ricevere il riscontro. Questo permette una velocità di trasmissione di "finetra/RTT". La finestra si sposta solo se il pacchetto da confermare più longevo, viene riscontrato.
+- controllo di congestione: reazione in caso di congestione.
+
+I pacchetti non sempre arrivano però nell'ordine con cui vengono inviati, inoltre alcuni potrebbero persino andar persi. Dopo aver inviato un segmento, viene avviato per esso l'RTO, e verrà reinviato il pacchetto se non arriva riscontro.
+
+- - -
+__nb__: in un messaggio di riscontro, viene specificato quale pacchetto è atteso, ma anche che non è atteso il pacchetto che si sta riscontrando.
+- - -
