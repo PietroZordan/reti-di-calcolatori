@@ -1,4 +1,4 @@
-# <h1 style: "text-align: center;"> Reti di calcolatori </h1>
+<h1 style: "text-align: center;"> Reti di calcolatori </h1>
 # Zordan Pietro 2022/2023
 
 
