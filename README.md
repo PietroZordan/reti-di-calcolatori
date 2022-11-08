@@ -1,3 +1,8 @@
+# <h1 style: "text-align: center;"> Reti di calcolatori </h1>
+# Zordan Pietro 2022/2023
+
+
+
 # Introduzione 03/10/2022
 ## Comunicazione
 La prima proprietà di cui è giusto a parlare è la comunicazione tra 2 entità (o calcolatori).
@@ -389,11 +394,71 @@ __nb__: SRTT attuale= alpha SRTT precedente + (1-alpha) RTT instantaneo. Alpha �
 - - -
 
 ## Trasmissione dei pacchetti
-- controllo di flusso: azione preventiva che limita la quantità di dati immessi nella rete. Viene definità una dimensione detta "di finestra", e tale dimensione detta la dimensione della serie di pacchetti da inviare prima  di ricevere il riscontro. Questo permette una velocità di trasmissione di "finetra/RTT". La finestra si sposta solo se il pacchetto da confermare più longevo, viene riscontrato.
+La velocità di trasmissione dipende dell'RTT, infatti "1/RTT" in quanto mando un segmento ad ogni RTT. Se l'RTT è grande la trasmissione sarà molto lenta. Si potrebbe inviare una serie di pacchetti invece di uno singolo, ma si andrebbe a creare della __congestione di rete__, andando a riempire il buffer, risultando in perdita di pacchetti. La quantità di trasmessi che conviene trasmettere ci viene data da 2 azioni:
+- controllo di flusso: azione preventiva che limita la quantità di dati immessi nella rete. Viene definità una dimensione detta "di finestra", e tale dimensione detta la dimensione della serie di pacchetti da inviare prima  di ricevere il riscontro. Questo permette una velocità di trasmissione di "finetra/RTT". La finestra si sposta solo se il pacchetto da confermare più longevo, viene riscontrato. L'umento della finestra avviene secondo due algoritmi, __slow start__ e __congestion avoidance__, mentre la sua diminuzione mediante due modalità, __vanilla__ e __fast retrasmit/ fast recovery__.
 - controllo di congestione: reazione in caso di congestione.
 
 I pacchetti non sempre arrivano però nell'ordine con cui vengono inviati, inoltre alcuni potrebbero persino andar persi. Dopo aver inviato un segmento, viene avviato per esso l'RTO, e verrà reinviato il pacchetto se non arriva riscontro.
 
 - - -
 __nb__: in un messaggio di riscontro, viene specificato quale pacchetto è atteso, ma anche che non è atteso il pacchetto che si sta riscontrando.
+
+__nb__: la dimensione della finestra non è fissa, ma tenderà ad aumentare col tempo.
+- - -
+
+# Congestione 04/11/2022
+## Algoritmi window
+### Aumento della finestra di trasmissione
+La finestra di congestione, oltre a scorrere lungo i pacchetti, aumenta di dimensione. Per farlo utilizza i seguenti algoritmi:
+- slow start: per ogni riscontro ricevuto, aumento la finestra di un pacchetto, oltre a farla scorrere di un pacchetto. Caratterizzato da un'evoluzione esponenziale nel tempo.
+- congestion avoiance: per ogni riscontro ricevuto, aumento la finestra di 1/w (w è il precedente valore della finestra). Caratterizzato da un'evoluzione lineare nel tempo.
+
+### Diminuizione della finestra
+Se non viene ricevuto un riscontro di un pacchetto inviato, allo scadere del RTO, la dimensione della finestra verrà ridotta, e lo farà secondo le seguenti funzionalità: 
+- vanilla: la finestra viene posta a dimensione 1.
+- fr/fr: la dimensione della finestra viene dimezzata.
+I segmenti persi verranno poi ritrasmetti.
+
+## Controllo di congestione del TCP
+Nel controllo di congestione, l'algroritmo necessita di 4 variabile da tenere conto:
+- CWND: dimensione attuale della finestra di congestione.
+- RTO: calcolato dinamicamente in base all'RTT istantaneo.
+- RCVWND: indica la finestra massima di ricezione.
+- SSTHRESH: dimensione della finestra oltre la quale non posso usare lo slow start.
+
+La prima fase, è l'__inizializzazione__ delle variabili:
+- CWND = 1.
+- RTO = valore calcolato durante l'apertura della connessione.
+- RCVWND = valore comunicato dalla destinazione.
+- SSTHRESH iniziale = RCVWND iniziale (in alcune implementazioni si usa RCVWND /2).
+
+La seconda fase, è quella dell'algoritmo vero e proprio:
+1. invia un numero di segmenti, pari alla CWND.
+2. quando arrivano i riscontri:
+  - CWND < SSTHRESH: uso lo slow start, CWND = minimo(CWND+ackNumber , RCVWND , SSTHRESH).
+  - CWND > SSTHRESH: uso il congestion avoidance, CWND = minimo(CWND+(ackNumber/CWND) , RCVWND).
+  A questo punto si torna al punto 1, con la nuova CWND.
+3. se non arrivano i riscontri, e quindi è scaduto l'RTO, pongo la "SSTHRESH = CWND/2" e:
+  - vanilla: CWND = 1.
+  - fr/fr: CWND = SSTHRESH.
+  Per i segmenti che vado a ritrasmettere, porrò "RTO = 2*RTO".
+
+- - -
+__nb__: CWND (congestion window).
+
+__nb__: RCVWND (receive window). Viene contenuto nel campo window dell'header TCP.
+
+__nb__: SSTHRESH (slow start threshold).
+- - -
+
+## Protocollo UDP
+
+Il protocollo è connectionless non affidabile, chiaramente sarà provvisto di una struttura notevolemente più semplice del TCP.
+### Header del messaggio
+Anche in questo caso, l'header è suddiviso in righe da 32 bit:
+- porte sorgente e destinazione.
+- lunghezza  e checksum.
+
+- - -
+__nb__: UDP (user datagram protocol)
 - - -
