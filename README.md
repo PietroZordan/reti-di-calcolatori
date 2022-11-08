@@ -15,8 +15,12 @@
 ### TCP nel livello di trasporto 28/10/2022
 
 ### Protocollo TCP 02/11/2022
-
+- __Suddivisione in pacchetti__
+- __Chiusura della connessione__
+- __Controllo di flusso__
 ### Congestione 04/11/2022
+- __Finestra di congestione__
+- __Controllo di congestione__
 
 
 
