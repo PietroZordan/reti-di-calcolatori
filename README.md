@@ -22,7 +22,8 @@
 - __Finestra di congestione__
 - __Controllo di congestione__
 
-
+- - -
+- - -
 
 # Introduzione 03/10/2022
 ## Comunicazione
