@@ -1,5 +1,22 @@
-<h1 style: "text-align: center;"> Reti di calcolatori </h1>
+# Reti di calcolatori
 # Zordan Pietro 2022/2023
+## Indice:
+
+### Introduzione 03/10/2022
+
+### Trasferimento 07/10/2022
+
+### Indirizzo IP 19/10/2022
+
+### Applicazioni Web 21/20/2022
+
+### Potocolli HTTP e di posta elettronica 26/20/2022
+
+### TCP nel livello di trasporto 28/10/2022
+
+### Protocollo TCP 02/11/2022
+
+### Congestione 04/11/2022
 
 
 
