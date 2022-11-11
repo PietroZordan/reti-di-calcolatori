@@ -21,6 +21,9 @@
 ### Congestione 04/11/2022
 - __Finestra di congestione__
 - __Controllo di congestione__
+### Protocollo IP 09/11/2022
+- __Livello di rete__
+- __Frammentazione IP__
 
 - - -
 - - -
@@ -484,3 +487,87 @@ Anche in questo caso, l'header è suddiviso in righe da 32 bit:
 - - -
 __nb__: UDP (user datagram protocol)
 - - -
+
+# Protocollo IP 09/11/2022
+## Livello di rete
+A differenza dei livelli di applicazione e trasporto, il livello di rete è presente in tutti gli apparati, non solo negli "end-system". Non dovendo preocuparsi di gestire eventuali perdite di dati (se ne occupa il livello di trasporto), il livello di rete deve fare il possibile per far arrivare il pacchetto a distenazione. Non è comunque garantito che il pacchetto arrivi a destinazione, in quanto il livello di rete è un livello __best effort__, ovvero fà il possibile, ma non garantisce nulla.
+
+### Formato dei messaggi
+Quando il livello di rete riceve i pacchetti dal livello applicativo, gli aggiunge il suo header. Oltre all'header, il pacchetto viene inserito dentro una "busta esterna" detta __payload__, a cui l'header si attaccherà. Quando il pacchetto verrà inviato, i vari router leggeranno solo l'header IP.
+L'header dei messaggi del protocollo IP, che di base è di 20 byte, è diviso in righe da 32 bit e così strutturato:
+- VERS (4 bit), linghezza dell'header (4 bit), service type(8 bit), lunghezza totale (16 bit).
+- Frammentazione: indetificazione (16 bit), flags (3 bit), fragment offset (13 bit).
+- TTL (8 bit), type (8 bit), checksum (16 bit).
+- Indirizzo IP sorgente.
+- Indirizzo IP destinazione.
+- Eventuali opzioni.
+
+Il TTL è necessario, in quanto si possono verificare dei problemi al routing, detti __routing loop__.
+Il checksum verrà fatto sull'header e non sul pacchetto, per essere sicuri che non contenga errori.
+
+- - -
+__nb__: IP (internet protocol).
+
+__nb__: il livello di rete si occuperà del dialogo tra macchine adiacenti. 
+
+__nb__: VERS è la versione del protocollo utilizzato. Attualmente possediamo la v4. Esiste però una v6 che dovrebbe prima o poi rimpiazzarla.
+
+__nb__: la lunghezza dell'header è espressa in byte. Se non ci sono opzioni, è lunga 20 byte. La lunghezza totale è invece la somma dei byte dell'header e del payload.
+
+__nb__: Service type è un codice che identifica la classe di servizio. La classe di servizio servirà per stabilire delle file di priorità all'interno dei buffer che ricevono i pacchetti.
+
+__nb__: TTL (time to live), è un contatore inizializzato dalla sorgente (inizializzato solitamente a 64 o 128), che identifica il numero massimo di hop che il pacchetto può attraversare. Ogni router attraversato decrementa di uno il valore del TTL, e se un router riceve un pacchetto con TTL=1 e che quindi riduce a 0, scarta il pacchetto inviando un messaggio di errore alla sorgente.
+
+__nb__: il campo Type è un codice che identifica il protocollo trasportato nel payload. Permette ai router di capire che tipo di pacchetto stanno trasportando. Per esempio potrebbe essere utile come politica di scarto dei pacchetti, se il pacchetto ha protocollo TCP avrà più importanza di un con UDP, e nel caso sarò quest'ultimo ad essere scartato.
+- - -
+
+### Frammentazione IP
+La frammentazione dei pacchetti avverà in base al valore di MTU, che indica la dimensione massima del pacchetto che la scheda di rete può trasmettere. L'MTU avrà un valore di partenza, che varierà col percorso lungo i router. I valori che acquisirà sono contenuti nelle interfaccie di uscita dei vari router.
+Nel caso in cui l'MTU di uno dei router, e minore di quello precedente, il pacchetto verrà spezzato in frammenti con la dimensione del MTU del router. Ogni frammento sarà indipendente, e quindi deve avere un header che differirà di frammento in frammento per alcuni campi, per far capire alla destinazione che sono frammenti. Ad esempio Ip sorgente e destinazione saranno uguali in tutti gli header. Vediamo il campo di frammentazione:
+- identificazione: numero progressivo dato dalla sorgente ad ogni pacchetto IP.
+- flag "M", o more fragment: se 1 esistono altri frammenti, se 0 non è stato frammentato o è l'ultimo frammento.
+- offset: posizione del frammento rispetto al pacchetto originario, in termini di "byte/8".
+
+I frammenti verranno poi riassemblati alla destinazione. Una volta ricevuto il primo frammento, partirà un timer (250-500 ms), entro il quale dovranno arrivare gli altri frammenti, altrimenti verrà tutto scartato.
+
+- - -
+__nb__: la frammentazione non ha niente a che vedere sulla segmentazione a livello di trasporto.
+
+__nb__: MTU (maximum tranfer unit).
+
+__Esempio__: MTU di partenza di 5000byte, pacchetto generico di 4000byte + 20byte header ip. Il pacchetto non essendo frammentato avrà Id a 803, offset e flag-M a 0. Sul percorso incontra una MTU di 1420byte (1400 payload, 20 header), che lo frammenta in 3 frammenti da 1420byte ciascuno. I frammenti avranno:
+1. id: 803, m-flag: 1, offset: 0.
+2. id: 803, m-flag: 1, offset: 175 (1400/8).
+3. id: 803, m-flag: 0, offset: 350 (2800/8).
+- - -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
