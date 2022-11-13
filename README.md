@@ -24,7 +24,9 @@
 ### Protocollo IP 09/11/2022
 - __Livello di rete__
 - __Frammentazione IP__
-
+### Routing 11/11/2022
+- __Instradamento__
+- __Algoritmi distance vector__
 - - -
 - - -
 
@@ -541,7 +543,30 @@ __Esempio__: MTU di partenza di 5000byte, pacchetto generico di 4000byte + 20byt
 3. id: 803, m-flag: 0, offset: 350 (2800/8).
 - - -
 
+# Routing 11/11/2022
+## Consegna indiretta
+In una rete locale, gli utenti generalmente si connetteranno con il router mediante uno __switch__. Quando un host deve comunicare con un altro, recupera il suo indirizzo ip (attraverso il dns per esempio) e controlla il suo prefisso, per verificare che coincida con il proprio. In tal caso vuole dire che appartengono alla stessa rete. Ipotizzando di avere tre utenti A e B della stessa rete, e C, dobbiamo distinguere la comunicazione in:
+- consegna diretta: se A vuole comunicare con B, che fa parte della sua stessa rete, può farlo senza passare dal router, passando dallo switch.
+- consegna indiretta: se A vuole comunicare con C, invierà il pacchetto al router di default, che lo inoltrerà alla destinazione.
 
+## Instradamento
+La consegna indiretta introduce il concetto di __routing__ ovvero il processo di scoperta del cammino migliore, da una sorgente al tutte le possibili destinazioni. Con "cammino migliore" si intende quello più conveniente, in base a differenti criteri come la distanza da parcorrere, la velocità di trasmissione.
+Per risolvere il "problema decisionale" del routing, si adotta una "tecnica" di astrazione con grafi, dove i nodi sono i router, mentre gli archi sono i link tra i router.
+Si può dire quindi che il routing è il calcolo del cammino minimo su un grafo, ed esistono due classi di algoritmi che ci permettono di calcolarlo:
+- vettore distanza (distance vector).
+- stado dei collegamenti (link state).
+
+## Algoritmi Distance vector
+Si basano sul __criterio di consistenza__ ovvero, una porzione di cammino minimo è il cammino minimo tra i nodi che determinano tale posizione. La decisione del cammino, non si base sull'intera tipologia della rete, infatti ogni nodo conosce solo il costo del proprio vicino, e il costo che il vicino gli comunicherà per andare al vicino successivo. In parole povere, partendo dalla destinazione i nodi comunicano ai propri vicini il costo per raggiungerla.
+
+
+- - -
+__nb__: il router della propra LAN viene detto di dafult, useremo questa notazione d'ora in poi.
+
+__nb__: la distanza da percorrere si può misurare in router attraversati, ma anche la distanza vera e propria in termini di km, quindi la lunghezza del link tra un router ed un altro. 
+
+__nb__: agli archi dei grafi, possiamo associare un peso, che ne va a descrivere la caratteristica che vogliamo enfatizzare o studiare nel grafo. Il costo del cammino sarà la somma dei costi degli archi che lo compongono.
+- - -
 
 
 
