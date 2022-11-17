@@ -559,7 +559,6 @@ Si può dire quindi che il routing è il calcolo del cammino minimo su un grafo,
 ## Algoritmi Distance vector
 Si basano sul __criterio di consistenza__ ovvero, una porzione di cammino minimo è il cammino minimo tra i nodi che determinano tale posizione. La decisione del cammino, non si base sull'intera tipologia della rete, infatti ogni nodo conosce solo il costo del proprio vicino, e il costo che il vicino gli comunicherà per andare al vicino successivo. In parole povere, partendo dalla destinazione i nodi comunicano ai propri vicini il costo per raggiungerla.
 
-
 - - -
 __nb__: il router della propra LAN viene detto di dafult, useremo questa notazione d'ora in poi.
 
@@ -568,12 +567,46 @@ __nb__: la distanza da percorrere si può misurare in router attraversati, ma an
 __nb__: agli archi dei grafi, possiamo associare un peso, che ne va a descrivere la caratteristica che vogliamo enfatizzare o studiare nel grafo. Il costo del cammino sarà la somma dei costi degli archi che lo compongono.
 - - -
 
+# Routing 16/11/2022
+## Criterio di consistenza
+Ogni cammino è composto da più sottocammini, in base ai nodi e gli archi che attraversa. Il cammino per andare da un nodo A ad un nodo F può presentare un nodo C in esso, dividendo il cammino in 2 porzioni, dove la somma dei pesi darà quella del cammino A-F.
 
+## Tabella di routing
+Si tratta di una tabella che contiene per ogni destinazione, il next hop e il costo per raggiungere tale destinazione. La destinazione e il costo sono anche i due valori del distance vector.
+Un router conosce solo i propri vicini, e durante la fase di __inizializzazione__, se il vicino diretto coincide con la destinazione, il router porrà "D(i,v) = c(i,v)" altrimenti "D(i,w) = infinito". Periodicamente un router manda ai propri vicini il proprio distance vector, con il quale loro aggiorneranno la propria tabella di routing.
 
+## Algoritmo Bellman-Ford distribuito
+Si può dimostrare che, se il grafo è completamente connesso e i pesi degli archi sono maggiori di 0, l'algoritmo distance vector converge alla soluzione ottimo. Il numero di iterazione necessarie per la convergenza è proporzionale al diametro del grafo, inteso come il percorso minimo, più lungo da percorrere da un nodo all'altro. Quindi questo algoritmo permette di computare appunto questo percorso minimo più lungo, rispettando le condizioni specificate sopra.
 
+### Algoritmi Link State
+Al contrario degli algorimto distance vector, utilizzano un approccio __centralizzato__ rispetto al router, ovvero ogni router ha a disposizione l'intera tipologia della rete (quindi conosce tutta la struttura del grafo, pesi compresi), e può quindi calcolare autonomamente i cammini minimi.
 
+## Routing intra/inter - ISP
+I vari ISP sono collegati tra di loro attraverso dei router di bordo (un po' come  i router di default delle LAN), router che possono essere considerati esterni. Gli algoritmi distance vectore e link state, vengono utilizzati per calcolare i cammini minimo all'interno dell'ISP (intra-ISP), mentre per gestire il routing al di fuori dall'ISP (inter-ISP) è stato definito un protocollo un unico protocollo, distinto dalle due categorie, il __BGP__. La tabella di routing di un ISP sarà formata da destinazioni che si trovano all'interno dello stesso ISP, e altre che si trovano all'esterno.
 
+- - -
+__nb__: ogni router possiede una tabella di routing.
 
+__nb__: D(i,v): partenza i, destinazione v. In questo caso "v" è il vicino diretto.
+
+__nb__: c(i,w): partenza i, destinazione v. In questo caso "w" è un'altra destinazione.
+
+__nb__: infinito viene utilizzato in base al numero di hop, se troppo alto.
+
+__Esempio__: avendo
+- A --> B = 8
+- A --> E = 4
+- E --> B = 2
+Quando A riceverà da B ed E i distance vector, aggiornerà la tabella di routing, e per la destinazione B, metterà E come next-hop perchè il costo è minore. Non verrà fatto solo per i vicini, ma col tempo per tutte le possibili destinazione.
+
+__nb__: il distance vector può essere implementato da vari protocolli: RIP, IGP...
+
+__nb__: un esempio di algoritmo centralizzato è quello di Dijkstra.
+
+__nb__: in qualsiasi tipologia di algoritmo, in caso di guasti, serve del tempo perchè l'informazione si propaghi. Durante tale intervallo le tabelle di routing potrebbero essere errate e si potrebbero formare dei __routing loop__.
+
+__nb__; BGP (border gateway protocol).
+- - -
 
 
 
