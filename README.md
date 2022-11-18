@@ -605,11 +605,40 @@ __nb__: un esempio di algoritmo centralizzato è quello di Dijkstra.
 
 __nb__: in qualsiasi tipologia di algoritmo, in caso di guasti, serve del tempo perchè l'informazione si propaghi. Durante tale intervallo le tabelle di routing potrebbero essere errate e si potrebbero formare dei __routing loop__.
 
-__nb__; BGP (border gateway protocol).
+__nb__: BGP (border gateway protocol).
+
+__nb__: oltre ad intra/inter-ISP, può essere utilizzata la dicitura intra/inter-AS.
 - - -
 
+# Server DHCP 18/11/2022
+## Routing inter-AS
+Due ISP possono comunicare mediante più router di bordo, in modo da smaltire il traffico di dati in maniera efficiente e omogenea. All'interno della rete dell'ISP, grazie al routing si calcolerà quale router di bordo conviene raggiungere (in base al costo) per comunicare con l'esterno. Quindi nel caso una destinazione sia raggiungibile da più router di bordo, essi annunceranno che passando da loro sarà possibile raggiungerla, e viene adottata la soluzione __hot potato routing__ in cui viene scelto il router di bordo più vicino alla sorgente (con sorgente si intende il router che deve instradare il pacchetto).
+Visto che le destinazione inter-AS potrebbero essere estremamente numerose per essere memorizzate nella tabella di Routing, le destinazioni cercano di compattare gli indirizzi, poi con una successiva fase di __subnetting__ sarà possibile separare il blocco.
 
+## Protocolli di supporto
+### DHCP
+Gli indirizzi IP appartengono alla rete, e vengono assegnati di volta in volta quando un host si collega alla rete, dinamicamente dal __server DHCP__ della rete. I messaggi che si scambiano per l'assegnamento dell'indirizzo sono i seguenti:
+1. inizialmente l'host si assegna l'indirizzo IP "0.0.0.0". Ipotiziamo per il server "157.27.10.2".
+2. l'host manda un messaggio in broadcast (che raggungerà ovviamente anche il server), composto da un header IP e dal payload che conterrerrà il protocollo DHCP. Questo messaggio è chiamato __DHCP discover__. L'header sarà composto dalle seguenti righe:
+- campo type: contiene un codice specifico per il DHCP, in modo da poter capire il protocollo contenuto nel payload. Solo il server DHCP in questo modo aprirà il pacchetto.
+- 32 bit a 0, l'attuale indirizzo dell'host.
+- 32 bit a 1, che permette di indicare che il messaggio è di broadcast.
+All'interno del payload, e quindi del protocollo DHCP, c'è un campo in particolare "transaction id" che conterrà un numero casuale scelto dall'host.
+3. il server risponderà con un messaggio, composto sempre da un header IP e dal protocollo DHCP. Questo messaggio è chiamato __DHCP offer__. L'header sarà composto dalle stesse righe del messaggio di richiesta, ma con l'indirizzo del server al posto di "0.0.0.0". Nel payload sarà contenuto lo stesso "transaction id", più altri due campi, uno contenente l'indirizzo del server, e uno il nuovo indirizzo per l'host.
+4. l'host invia in broadcast un altro messaggio, chiamato __DHCP request__, dove l'header sarà uguale al "DHCP descover" mentre il payload conterrà i campi dell'ip del server, e dell'ip offerto.
+5. per finire il server invierà un messaggio chiamato __DHCP ack__, con l'header uguale a quello del "DHCP offer" e nel payload l'indirizzo del server, e quello offerto all'host.
 
+Ora l'host può utilizzare l'indirizzo IP. Il tempo per cui il client avrà a disposizione l'IP è limitato, ed è detto __lease__, allo scadere del quale il client dovrà richiederne il rinnovo al server, o un nuovo indirizzo.
+
+### ICMP
+
+- - -
+__nb__: nella tabella di routing, agli indirizzi saranno associate le maschere.
+
+__nb__: DHCP (dynamic host configuration protocol). Ogni rete possiede un server DHCP.
+
+__nb__: ICMP ().
+- - -
 
 
 
