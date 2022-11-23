@@ -630,17 +630,78 @@ All'interno del payload, e quindi del protocollo DHCP, c'è un campo in particol
 
 Ora l'host può utilizzare l'indirizzo IP. Il tempo per cui il client avrà a disposizione l'IP è limitato, ed è detto __lease__, allo scadere del quale il client dovrà richiederne il rinnovo al server, o un nuovo indirizzo.
 
-### ICMP
-
 - - -
 __nb__: nella tabella di routing, agli indirizzi saranno associate le maschere.
 
 __nb__: DHCP (dynamic host configuration protocol). Ogni rete possiede un server DHCP.
 
-__nb__: ICMP ().
 - - -
 
+# Limitatezza degli indirizzi IPv4 23/11/2022
+## Interfaccie del router
+Tra le informazioni fornite dal server DHCP ci sono anche la maschera, ovvero il prefisso della rete, l'indirizzo IP del router di dafault, l'indirizzo IP del DNS.
+Le interfaccie del router avranno un indirizzo del blocco della rete a cui è connesso, quindi il numero di indirizzi sarà uguale a quello delle interfaccie connesse alle reti.
 
+### Protocollo ICMP
+Lo scopo principale del protocollo è quello di inviare messaggi di errore o informazione relativi al livello di rete. Se ad esempio scade il TTL, il router scarta il pacchetto e invia un messaggio di errore alla sorgente, in questo caso proprio un messaggio ICMP, composto da:
+- header IP: composto da ip sorgente (router che invia il messaggio di errore), ip destinazione (host che aveva inviato il pacchetto), campo type con il codice ICMP.
+- payload ICMP: conterrà l'informazione "TTL expired".
+
+## Reti private
+Considerando che per un indirizzo IPv4 vengono utilizzati 32 bit, il numero di indirizzi, se pur elevato è limitato, e relativamente basso (4 miliardi di indirizzi). Sono state sviluppate 2 soluzioni:
+- IPv6: cambiare il protocollo IP.
+- indirizzi privati.
+
+Le seconda soluzione ci fa intendere che esistono indirizzi IP pubblici, che sono univoci, e privati, che possono essere usati in reti locali per il traffico locale. Quindi gli indirizzi privati non possono essere esposti verso la rete internet pubblica. Lo standard definisce i seguenti blocchi di indirizzi privati:
+- 10.0.0.0 /8.
+- 172.16.0.0 /12.
+- 192.168.0.0 /16.
+- 169.254.0.0 /16.
+
+### NAT
+I router che dividono una rete di indirizzi privati da una rete pubblica, dispongono di una funzionalità detta NAT, la cui idea base è quella di utilizzare l'indirizzo IP pubblico del router per l'instradamento.
+Il router dispone di una tabella NAT, composta dai seguenti campi (seguendo l'esempio sotto):
+- Ip sorgente: 192.168.1.3.
+- Ip destinazione: 80.70.60.2.
+- Porta sorgente: 10001
+- Porta destinazione: 80
+- Porta sorgente nuova: 20000
+
+Le porte sorgente e destinazione, sono quelle presenti nell'header TCP o UDP, all'interno del payload del pacchetto. Al passaggio del router, anche gli header TCP o UDP sostituiranno la porta sorgente e destinazione con la "porta sorgente nuova". Questo meccanismo è detto __NAPT__. Ad ogni record della tabella viene associato un timer, rinnovato ogni volta che viene utilizzato, e che eliminerà il record al suo termine.
+Nel caso un utente voglia comunicare con un'altro utente all'interno di una rete di indirizzi privati, il router scarterà ikl pacchetto, infatti in NAT non permette la comunicazione iniziale da host esterni. Alcune applicazioni in questo caso utilizzano __server di appoggio__ esterni, che terrà una comunicazione aperta con entrambi gli host.
+
+## IPv6
+L'header IPv6 è sempre diviso in righe da 32 bit, e suddiviso sei seguenti campi:
+1. version (4 bit), traffic class (8 bit), flow label (20 bit).
+2. lunghezza payload (16 bit), next header (), hop limit ().
+3. Ip sorgente (128 bit).
+4. Ip destinazione (128 bit).
+
+Quindi gli indirizzi saranno composti da 128 bit, non più divisi da una notazione decimale puntata, ma da una __esadecimale__ dividendo in 8 gruppi da 16 bit, rappresentati da 4 cifre esadicimali, separate dal simbolo ":". 
+
+- - -
+__nb__: i link dei router sono composti da un cavo di entrata e uno di uscita (duplex).
+
+__nb__: ICMP (internet control message protocol).
+
+__nb__: NAT (network address translation). NAPT (network address & port translation).
+
+__Esempio__: router che collega la rete di indirizzi privati 192.168.1.0 /24, con internet (16.10.2.0 /24):
+- interfaccia 1: 192.168.1.1.
+- interfaccia 2: connesso alla rete dell'ISP che offre il servizio, 16.10.2.1.
+
+Ipotizzando che un utente (192.168.1.3) della rete privata, voglia comunicare con un server di una rete, che ha indirizzo 80.70.60.2, invierà un pacchetto con un header IP (192.168.1.3 e 80.70.60.2). Quando il pacchetto passerà il router, l'indirizzo sorgente nell0header prenderà l'indirizzo dell'interfaccia pubblica del router. Anche in un eventuale pacchetto del server, la destinazione sarà l'interfaccia del router, che una volta ricevuto, andrà a sostituirlo con l'indirizzo originario di chi aveva generato il pacchetto.
+
+__nb__: traffic class= gestisce la priorità tra i pacchetti.
+
+__nb__: flow label= etichetta per far percorrere ai pacchetti dello stesso flusso lo stesso percorso.
+
+__nb__: hop limit = equivale al TTL di IPv4.
+
+__nb__: numero indirizzi IP per metro quadrato (oceani inclusi) è 6 * 10^23.
+
+__Esempio__: indirizzo IPv6, 69DC:8864:FFFF:0000:...
+- - -
 
 
 
