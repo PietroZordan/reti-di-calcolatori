@@ -671,7 +671,7 @@ Le porte sorgente e destinazione, sono quelle presenti nell'header TCP o UDP, al
 Nel caso un utente voglia comunicare con un'altro utente all'interno di una rete di indirizzi privati, il router scarterà ikl pacchetto, infatti in NAT non permette la comunicazione iniziale da host esterni. Alcune applicazioni in questo caso utilizzano __server di appoggio__ esterni, che terrà una comunicazione aperta con entrambi gli host.
 
 ## IPv6
-L'header IPv6 è sempre diviso in righe da 32 bit, e suddiviso sei seguenti campi:
+L'header (detto header di base, 40 byte) IPv6 è sempre diviso in righe da 32 bit, e suddiviso sei seguenti campi:
 1. version (4 bit), traffic class (8 bit), flow label (20 bit).
 2. lunghezza payload (16 bit), next header (), hop limit ().
 3. Ip sorgente (128 bit).
@@ -701,9 +701,45 @@ __nb__: hop limit = equivale al TTL di IPv4.
 __nb__: numero indirizzi IP per metro quadrato (oceani inclusi) è 6 * 10^23.
 
 __Esempio__: indirizzo IPv6, 69DC:8864:FFFF:0000:...
+
+__nb__: la soluzione migliore tra NAT e IPv6, è il NAT.
 - - -
 
+# Livello data-link 25/11/2022
+## Campo next-header
+Si tratta di un campo che possiede 2 significati:
+- se c'è solo l'header di base, il campo identifica il protocollo trasportato nel payload. In poche parole equivale al campo type dell'IPv4.
+- Se sono presenti uno o più header aggiuntivi, il campo ne indica il tipo. Questi header vengono detti __extension header__, sono sempre definiti dallo standard, e sono specifici per una determinata funzionalità, ad esempio la frammentazione.
+L'extension header è composto dai campi: next header (8 bit) e header length (8 bit), il resto sono tutti dati dell'header.
+Se in futuro venissero introdotte delle nuove funzionalità, è possibile creare un nuovo extension header. Se un router non è aggiornato, e non sa interpretare uno specifico extension header, lo ignora.
 
+## Secondo livello
+Ad ogni singolo hop, viene creato dal livello data-link, e scartato dall'host successivo, un __header di livello 2__. Lo scopo del livello è quello di gestire le problematiche associate alla trasmissione sul singolo hop. L'header del livello 2, dipende dalla tecnologia utilizzata nella scheda di rete (wifi (802.11), ethernet (802.3) ...).
+Questo livello riscontra 2 principali problematiche:
+- gestione del mezzo condiviso.
+- delimitazione delle trame.
+
+### Accesso al mezzo condiviso
+Il principale mezzo di trasmissione condiviso è la trasmissione __wireless__. Nella trasmissione wireless, il router si interfaccia con gli hot attraverso un access-point, che comunica con loro tramite onde elettromagnetiche che si propagano in tutte le direzioni. Visto che gli host usano lo stesso mezzo, le loro trasmissioni con l'access-point potrebbero interferire.
+Ormai non utilizzato più, un altro mezzo condiviso era la trasmissione su __cavo coassiale condiviso__. Ogni host possedeva un cavo coassiale che trasportava il segnale, e venivano collegati tramite un altro cavo coassiale. Il cavo era composto da un filo conduttore immerso in un materiale isolante, ricoperto da una maglia sempre di materiale conduttore, e infine un'altra guaina isolante.
+
+### Tecniche di allocazione
+In caso di trasmissione contemporanea, abbiamo collisione e quindi la distruzione dell'informazione, non potendo essere correttamente interpretata. Per ovviare a questo problema, viengono usate delle tecniche per l'allocazione del canale di trasmissione, che permettono di organizzare e allocare il canale alle diverse sorgenti che lo utilizzano. Queste tecniche sono varie, ci sono quelle centralizzate (master/slave, dove master è la CPU) e quelle __statiche__:
+- FDM: viene assegnato ad ogni sorgente una frequenza diversa.
+- TDM: le sorgenti hanno tutte un quanto di tempo, e si alternano (meccanismo simile al time-sharing).
+Un altro tipo sono le tecniche __dinamiche__:
+- a turno: ogni sorgente ha un quantità di tempo per trasmettere, al termine del quale passa il turno al vicino. Il problema più grande è stabilire l'ordine con cui le sorgenti si passano il turno .Un esempio è la tecnologia detta __token ring__.
+- a contesa: il primo che trova il canale libero, trasmette, altrimenti resta in attesa. Di questo tipo, ci sono 3 protocolli principali, ALOHA, SLOTTED ALOHA, CSMA.
+
+- - -
+__Esempio__: ipotizzando che venga creato un messaggio abbastanza piccolo da non essere diviso in pacchetti. A livello di trasporto verrà aggiunto un header TCP, al livello di rete viene aggiunto l'header IP. Il livello di collegamento dati, come hanno fatto i livelli precedenti, considererà il prodotto come il suo payload, e gli ci aggiunge un header (L2). Dopo essere stato inviato e ricevuto da un'altro host, il livello di data-link scarterà l'header L2.
+
+__nb__: un access-point è un appartato di livello 2, da un lato connesso al router, dall'altro dispone di un'interfaccia wireless, con cui comunica con i vari host.
+
+__nb__: FDM (frequency division multiplex), TDM (time division multiplex).
+
+__nb__: l'allocazione statica prevede di conoscere fin da subito il numero di sorgenti.
+- - -
 
 
 
