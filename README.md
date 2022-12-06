@@ -741,11 +741,44 @@ __nb__: FDM (frequency division multiplex), TDM (time division multiplex).
 __nb__: l'allocazione statica prevede di conoscere fin da subito il numero di sorgenti.
 - - -
 
+# Tecniche dinamiche a contesa 02/12/2022
+## Algoritmo Aloha
+1. Se ci sono dei dati da trasmettere, vengono trasmessi.
+2. Mentre trasmette, ascolta il canale. Se c'è collisione viene estratto un tempo casuale, si attende e si torna al punto 1.
+Per la casualità del tempo, il protocollo definisce una costante M (molto maggiore del tempo di trasmissione) e le stazione scelgono un tempo uniformemente distribuito nell'intervallo (0,M). M verrà raddoppiato in caso di collisioni consecutive.
+Il __periodo di vulnerabilità__ è l'intervallo di tempo in cui una __trama__ può subire collisione. Se identifichiamo il tempo di trama con T, il periodo di vulnerabilità sarà 2*T. Se si volesse calcolare l'efficienza del protocollo ALOHA, con l'aumento delle trasmissioni si può notare che aumentano le collisioni.
 
+### Slotted Aloha
+In questa variante, il tempo è suddiviso a intervalli (slot) della durata di T secondi (come il tempo di trama), e le sorgenti seguono il protocollo ALOHA, ma quando generano una trama possono trasmetterla solo all'inizio dello slot successivo. In questo caso il periodo di vulnerabilità sarà pari a T, ovvero la dimensione dello slot, aumentando notevolmente l'efficienza.
 
+## CSMA
+1. Se ci sono dei dati da trasmettere, prima ascolta il canale.
+2. Se il canale è libero, allora trasmette la trama, ma se è occupato aspetta che il canale si liberi e poi trasmette.
+3. Se ci sono collisioni, estraggo un tempo casuale e torno al punto 1.
+Le collisioni avvengono nel caso entrambe le sorgenti controllino se è occupato il canale nello stesso momento, finendo per iniziare la trasmissione e un'inevitabile collisione.
 
+### Varianti CSMA
+Questa è la versione base del CSMA, detta "persistent", ma ne esistono moltre altre. Una di queste è detta "non-persistent" e va a modificare il punto 2:
+2. Se il canale è occupato, viene estratto un tempo casuale e si ripete dal punto 1.
+Ne consegue un maggiore ritardo. Un'altra variante è detta "p-persistent" che va a modificare sempre il punto 2:
+2. Se il canale è occupato, aspetta che il canale si liberi, e poi trasmetterà con probabilità "p" mentre con probabilità "1-p" rimanderà di un __microslot__ (la cui durata è molto minore di quella di trama T).
 
+### CSMA-CD
+Quest'ultima variante va a modificare il punto 3:
+3. Se c'è collisione, interrompo la trasmissione, estraggo un tempo casuale e torno al punto 1. Nelle altre varianti di CSMA, la trasmissione non veniva interrotta.
+Attualmente, per il protocollo ethernet (802.3), viene adottato il protocollo CSMA-CD persistent.
 
+- - -
+__nb__: la collisione avviene se la potenza rilevata è maggiore di quella trasmessa.
+
+__nb__: il tempo di trasmissione è detto __tempo di trama__,
+
+__nb__: efficienze aloha: 19%, slotted aloha: 38%, csma persistent: 58%, csma p(0,01): la più efficiente.
+
+__nb__: CSMA (carrier sense multiple access). CD (collision detection).
+
+__nb__: considerando che una trasmissione ci impiega del tempo ad arrivare ad altre sorgenti e qundi essere identificata, e questo è definito con "tau" e detto il ritardo massimo di propagazione tra 2 sorgenti, allora il periodo di vulnerabilità nel CSMA è pari a 2 * tau.
+- - -
 
 
 
