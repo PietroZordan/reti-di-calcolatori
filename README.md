@@ -780,11 +780,43 @@ __nb__: CSMA (carrier sense multiple access). CD (collision detection).
 __nb__: considerando che una trasmissione ci impiega del tempo ad arrivare ad altre sorgenti e qundi essere identificata, e questo è definito con "tau" e detto il ritardo massimo di propagazione tra 2 sorgenti, allora il periodo di vulnerabilità nel CSMA è pari a 2 * tau.
 - - -
 
+#  07/12/2022
+## Ethernet IEEE 802.3
+Divenuto uno standard, presenta diverse forme scalabili:
+- base: 10 Mbit/s
+- fast ethernet : 100 Mbit/s
+- gigabit ethernet : 1 Gbit/s
+Possono essere utilizzati per connettere calcolatori, ma anche apparati di rete, generalmente per questi ultimi vengono utilizzate velocità di 10 e 40 Gbit/s.
 
+### Formato dei messaggi
+L'header è composto dai seguenti campi:
+- preambolo (7 byte): sequenza di 0 e 1 alternati, che permette di  sincronizzare in una comunicazione chi riceve e che trasmette. Si sincronizza con il clock di chi riceve.
+- flag (1 byte): serve per la delimitazione delle trame (01111110).
+- destinazione hardware (6 byte): contiene l'indirizzo MAC del destinatario.
+- sorgente hardware (6 byte): contiene l'indirizzo MAC della sorgente.
+- lunghezza payload (2 byte)
+Successivo al payload contiene un'ultima sessione, detta __trailer__, che conterrà la checksum.
 
+### Protocollo ARP
+Questo protocollo permette ad un host di conoscere gli indirizzi MAC degli host della propria rete. Più precisamente, dato l'indirizzo IP permette di conoscere l'indirizzo MAC:
+1. l'host manda in broadcast (livello 2) una richiesta ARP con l'indirizzo ip di cui non conosce il corrispondente MAC. Si parla di "ARP request".
+2. solo chi possiede l'indirizzo IP richiesto, risponde direttamente con il proprio MAC. Si parla di "ARP reply".
 
+Le risposte ARP vengono memorizzate in una __tabella ARP__, contenente i campi: IP, MAP, tempo di validità.
 
+## Lan estese
+Tornando al discorso del cavo coassiale che collega i vari calcolatori, se parliamo in termini di cablaggio strutturato, è facilmentre attuabile se i calcolatori sono nella stessa stanza. In caso contrario, ad esempio i calcolatori che si sviluppano in tutto un palazzo, bisogna attuare diverse soluzioni:
+- Hub: apparato di livello 1 , che connette due cavi tra loro. Permette quindi di applicare ad un cavo vari estensioni.
+- Bridge: apparato di livello 2, a due porte, avente lo stesso obiettivo dell'hub, ma che non si ferma appunto al livello 1. Può quindi ricevere completamente le trame, controllare l'indirizzo MAC di destinazione, e rigira la trama sul segmento che punta alla destinazione. Per farlo mantiene una tabella, che associa gli indirizzi MAC con il corrispondente segmento.
+- Switch: so tratta di un bridge con n porte, e per ogni porta un segmento.
 
+- - -
+__nb__: per i 40 Gbit/s in realtà è necessaria la fibra ottica.
 
+__nb__: nei 2 campi di hardware, sono contenuti gli indirizzi fisici delle macchine, assegnati alla scheda di rete quando viene prodotta, gli indirizzi __MAC__. In una consegna indiretta, l'indirizzo MAC di destinazione sarà quello del router di bordo, a quel punto il router scarterà l'header, aprirà il pacchetto, e assegnerà un nuovo header che permetta al messaggio di arrivare a destinazione.
 
+__nb__: ARP (address resolution protocol).
 
+__nb__: un Hub può avere 2 o più porte.
+
+- - -
