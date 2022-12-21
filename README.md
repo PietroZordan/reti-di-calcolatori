@@ -27,6 +27,32 @@
 ### Routing 11/11/2022
 - __Instradamento__
 - __Algoritmi distance vector__
+### Routing 16/11/2022
+- __Tabella di routing__
+- __Bellman Ford__
+- __Inter/intra isp__
+### Server DHCP 18/11/2022
+- __Hot potato routing__
+- __DHCP__
+### Limitatezza degli indirizzi IPv4 23/11/2022
+- __ICMP__
+- __NAT__
+- __IPv6__
+### Livello data-link 25/11/2022
+- __Next-header__
+- __Accesso al mezzo condiviso__
+### Tecniche dinamiche a contesa 02/12/2022
+- __Aloha__
+- __CSMA__
+### Indirizzi logici e fisici 07/12/2022
+- __Ethernet__
+- __ARP__
+- __Lan estese__
+
+
+
+
+
 - - -
 - - -
 
@@ -780,7 +806,7 @@ __nb__: CSMA (carrier sense multiple access). CD (collision detection).
 __nb__: considerando che una trasmissione ci impiega del tempo ad arrivare ad altre sorgenti e qundi essere identificata, e questo è definito con "tau" e detto il ritardo massimo di propagazione tra 2 sorgenti, allora il periodo di vulnerabilità nel CSMA è pari a 2 * tau.
 - - -
 
-#  07/12/2022
+# Indirizzi logici e fisici 07/12/2022
 ## Ethernet IEEE 802.3
 Divenuto uno standard, presenta diverse forme scalabili:
 - base: 10 Mbit/s
@@ -805,10 +831,10 @@ Questo protocollo permette ad un host di conoscere gli indirizzi MAC degli host 
 Le risposte ARP vengono memorizzate in una __tabella ARP__, contenente i campi: IP, MAP, tempo di validità.
 
 ## Lan estese
-Tornando al discorso del cavo coassiale che collega i vari calcolatori, se parliamo in termini di cablaggio strutturato, è facilmentre attuabile se i calcolatori sono nella stessa stanza. In caso contrario, ad esempio i calcolatori che si sviluppano in tutto un palazzo, bisogna attuare diverse soluzioni:
+Tornando al discorso del cavo coassiale che collega i vari calcolatori, se parliamo in termini di cablaggio strutturato, è facilmentre attuabile se i calcolatori sono nella stessa stanza. In caso contrario, ad esempio i calcolatori che si sviluppano in tutto un palazzo, bisogna attuare diverse soluzioni, mediante diversi apparati:
 - Hub: apparato di livello 1 , che connette due cavi tra loro. Permette quindi di applicare ad un cavo vari estensioni.
 - Bridge: apparato di livello 2, a due porte, avente lo stesso obiettivo dell'hub, ma che non si ferma appunto al livello 1. Può quindi ricevere completamente le trame, controllare l'indirizzo MAC di destinazione, e rigira la trama sul segmento che punta alla destinazione. Per farlo mantiene una tabella, che associa gli indirizzi MAC con il corrispondente segmento.
-- Switch: so tratta di un bridge con n porte, e per ogni porta un segmento.
+- Switch: si tratta di un bridge con n porte, e per ogni porta un segmento.
 
 - - -
 __nb__: per i 40 Gbit/s in realtà è necessaria la fibra ottica.
@@ -818,5 +844,78 @@ __nb__: nei 2 campi di hardware, sono contenuti gli indirizzi fisici delle macch
 __nb__: ARP (address resolution protocol).
 
 __nb__: un Hub può avere 2 o più porte.
+
+- - -
+
+# WLAN  14/12/2022
+## Dominio di broadcast e collisione
+Il dominio di broadcast viene definito come la porzione di rete raggiunta da un messaggio di broadcast di livello 2. Il dominio di collisione è la porzione di rete dove si ha collisione, se due stazioni trasmettono contemporaneamente. Il dominio di broadcast viene spezzato dal router, mentre quello di collisione viene spezzato da bridge e switch.
+
+## WLAN (802.11)
+Presenta due modalità:
+- ad hoc: le varie strutture comunicano direttamente tra di loro.
+- infrastruttura: presenta un apparato detto __access point__, che rappresenta l'apparato di riferimento per la comunicazione. L'area wireless che rientra nel campo dell'access-point, è detta __BSS__, all'interno del quale, se gli host vogliono comunicare tra di loro, dovranno prima passare per l'access-point.
+
+- - -
+__Esempio__: avendo un router che collega 2 lan con internet, e un host della lan1 che manda un messaggio di broadcast, il dominio di broadcast sarà la lan1, infatti una volta arrivato al router, il secondo livello verrà scartato.
+
+__Esempio__: se due segmenti sono collegati mediante un hub, il dominio di collisione verrà rappresentato da entrambi i segmenti, mentre se sono divisi da un bridge, avremo 2 domini di collisione per i rispettivi segmenti.
+
+__Esercizio__: esercizi su algoritmi di livello 2 (Aloha, csma), e apparati di livello 2 (bridge).
+
+__nb__: WLAN (wireless lan). La modalità "ad hoc" è poco utilizzata.
+
+__nb__: BSS (basic service set).
+
+__nb__: lo standard è composto da una famiglia di specifiche, rappresentate ogniuna da una lettera diversa. Ad esempio 802.11a definisce un insieme di frequenze e le corrispondenti velocità di trasmissione.
+- - -
+
+# CSMA-CA 16/12/2022
+## Algoritmo CSMA-CA
+Nelle wlan il tempo è diviso in time-slot che sono proporzionali al ritardo di propagazione, e viene detto SIFS. Definiamo iun altro intervallo detto __DIFS__, che rappresenta una sequenza di 3 SIFS. Ora che abbiamo definito gli intervalli, si può parlare di __CSMA-CA__, ovvero un algoritmo dove quando una sorgente ha una trama da trasmettere, ascolta il canale:
+1. Se il canale è libero, continuo ad ascoltare il canale per un intervallo pari a DIFS, e se è ancora libero, trasmette la trama.
+2. Se il canale è occupato, sia fin da subito che durante il DIFS, continuo ad ascoltare il canale fino a quando non si libera.
+3. Quando il canale si libera, ascolto per un DIFS, in cui se torna occupato, torno al punto (2).
+4. Se il canale è rimasto libero durante il DIFS, la stazione estrae un numero intero casuale "s", uniformemente distribuito tra 0 e "CW-1", che sarà il numero di SIFS da attendere prima di trasmettere. Ad ogni SIFS, se il canale rimane libero, viene decrementato "s" di 1, e arrivati a "s=0" la sorgente trasmette la trama. Se invece il canale torna occupato, prima di arrivare a 0, congelo il valore di "s", torno al punto (2), e quando sarò arrivato al punto (4) utilizzerò il valore di "s" congelato.
+5. Se c'è collisione, viene interrotta la trasmissione, viene estratto un tempo casuale, si torna al punto 1, ma si raddioppia "CW".
+
+## Terminale nascosto
+Problema che afflige le WLAN. Nell comunicazione wireless, l'onda di trasmissione viene generata in tutte le dimensioni, non solo tra 2 host comunicanti, quindi è molto altra la dissipazione. Data la potenza di trasmissione, c'è una distanza massiama oltre la quale il segnale non è ricostruibile (rumore bianco). Nel tempo in cui un host trasmette ad un altro, questo potrebbe iniziare un'altra trasmissione verso quello stesso host. In quel caso le 2 trasmissioni entrano in collisione, viene rilevata dall'access-point, ma nessuno dei 2 host la rileva. Per risolvere questo problema:
+- si limita lo spazio di responsabilità dell'access-point.
+- vengono introdotti 2 messaggi, RTS e CTS. Se "A" deve trasmettere, manda un RTS, l'access-point risponde con un CTS in broadcast, così sia "A" che "B" sanno chè c'è una trasmissione, "A" trasmetterà, "B" starà fermo.
+
+- - -
+__nb__: SIFS : short inter-frame space.
+
+__nb__: CSMA-CA: CSMA collision avoidance.
+
+__nb__: la lunghezza dei time-slot SIFS e DIFS, è data dal clock dell'access-point.
+
+__nb__: CW (contention window), valore massimo del numero intero estratto.
+
+__nb__: lo standard vuole che l'ack di  livello 2, venga mandato dopo un SIFS.
+
+__nb__: RTS (request to send), CTS (clear to send).
+- - -
+
+# NAV e Framing 21/12/2022
+## NAV
+Dal punto di vista energetico, la maggior parte dell'energia è spesa per l'ascolto del canale, quindi con RTS/CTS le stazioni che non trasmettono ricevono comunque il CTS, e possono usare le informazioni contenute nel CTS stesso per addormentarsi, ovvero spegnere il circuito d'ascolto. Non solo con RTS/CTS è possibile risparmiare energia, nell'header 802.11 c'è un campo __payload length__: quando viene ricevuto il pacchetto, se è destinato ad un altro host, si legge il campo payload length e si spegne l'ascolto del canale, per appunto la lunghezza della trama. Questo meccanismo è detto __NAV__.
+
+## Delimitazione delle trame
+Nella pila TCP/IP i vari livelli gestiscono i dati nelle loro varie forme. Il livello fisico si occupa della gestione di bit, tradotti da un'onda elettromanietica. Nel caso ci siano più trame in sequenza, si uniranno tutte in una onda elettromanietica che verrà tradotta in bit. Quindi è necessario distinguere una trama dall'altra:
+- introdurre intervalli temporali tra una trama e la successiva. Comporta il problema che con la propagazione il segnale si distorce e rischia che i momenti di silenzio vengano coperti.
+- introdurre l'informazione sulla dimensione della trama (character count) nell'header, in modo da sapere quando la trama finirà, e inizierà la successiva. Se però dovesse verificarsi un errore nel campo, tutte le trame verranno interpretate male.
+- byte di flag. Viene aggiunta una sequenza specifica all'inizio e alla fine della trama. Il problema è lo stesso riscontrato nella soluzione precedente, con la differenza che verrà compromessa solo trama in cui c'è l'errore nel byte di flag.
+
+### Bit stuffing
+Nella trama può essere presente una sequenza uguale al byte di flag, quindi è stata adottata questa soluzione:
+- in trasmissione: ogni volta che questa sequenza viene incontrata, viene agginto uno 0.
+- in ricezione: ogni volta che viene individuata la sequenza, viene rimosso lo zero.
+
+- - -
+__nb__: NAV (network allocation vector), contatore che indica il tempo in cui il canale è occupato.
+
+__Esempio__: con sequenza di byteflag si intende una sequenza di bit del tipo 000101011.
 
 - - -
